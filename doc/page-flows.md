@@ -1,0 +1,1027 @@
+# Page Flows
+
+## Pages
+
+- Login
+- Access Denied
+- Dashboard
+- Test Projects
+  - Create Test Project
+  - Test Project Detail
+  - Project Overview
+  - Project Test Suites
+  - Project Snapshots
+  - Project Settings
+- Requirements
+  - Requirement Ingestion
+  - Requirement Detail
+  - Requirement Review
+- Test Cases
+  - Test Case Review
+  - Test Case Detail
+- Automation Scripts
+  - Script Generation
+  - Script Review
+  - Script Detail
+- Executions
+  - Execution Monitor
+  - Execution Results
+- Reports (TBD)
+- Settings
+
+![Page flows diagram](page-flows-media/media/image1.png)
+
+## Login Page
+
+### Purpose
+
+Authenticate users securely and route them into the system with correct role-based access.
+
+### Key Design Elements
+
+#### Layout
+
+- Centered authentication card
+- Company logo (top)
+- Environment label (e.g., Staging / Production)
+- Minimal, clean layout
+
+#### Components
+
+- Email input
+- Password input (if not SSO-only)
+- SSO login button
+- “Remember me” checkbox
+- “Forgot password” link
+- “Request access” link
+- Error message banner (inline)
+- Loading spinner state
+
+### Core Functionalities
+
+- Authenticate via:
+  - SSO (primary)
+  - Email/password (if enabled)
+- Validate credentials
+- Route to:
+  - Dashboard (default)
+  - Deep-linked page if URL exists
+- Log:
+  - Login timestamp
+  - IP
+  - Environment
+- Enforce:
+  - Session timeout
+  - Token refresh
+
+
+## Access Denied Page
+
+### Purpose
+
+Inform authenticated users that they lack permissions for a resource.
+
+### Key Design Elements
+
+#### Layout
+
+- Centered message block
+- Permission icon (shield/lock)
+
+#### Components
+
+- Title: “Access Restricted”
+- Explanation message
+- Display current user role
+- “Go to Dashboard” button
+- “Request Elevated Access” button
+
+### Core Functionalities
+
+- Display:
+  - Required role
+  - Current role
+- Send access request to admin
+- Redirect to Dashboard
+
+## Dashboard Page
+
+### Purpose
+
+Provide high-level operational visibility and triage across projects.
+
+### Key Design Elements
+
+#### Top Section
+
+- Page title
+- User profile dropdown (top right)
+  - User avatar and name
+  - User role
+  - Settings option
+  - Log out option
+
+#### Metric Cards (Grid)
+
+- Test Cases (total count)
+- Projects (total count)
+
+Note: Metric cards display without icons for a clean, minimal design
+
+#### Test Projects Table
+
+Combined dashboard with project management functionality:
+
+- Search bar
+- Filter by Status
+- "Create Project" button
+- Project table with columns:
+  - Project Name
+  - Owner
+  - Requirements (count)
+  - Test Cases (count)
+  - Test Scripts (count)
+  - Status
+  - Actions (View / Edit)
+
+### Core Functionalities
+
+- Click metric → drill into related module
+- Search and filter projects
+- Navigate to create project page
+- User profile management and logout
+- Open project details
+- Archive projects
+
+
+
+
+# Create Test Project Page
+
+### Purpose
+
+Initialize structured container for requirements, test cases, scripts, and executions. Configure project-level rules, permissions, and framework settings.
+
+### Key Design Elements
+
+#### Form Layout
+
+- Single-column form layout
+
+#### Sections
+
+Project Info
+
+- Project Name (Required)
+- Description
+
+Ownership
+
+- Project Owner (Required)
+- Additional Members
+
+AI Configuration
+
+- Prompt template  for test script , use markdown IDE. 
+- Prompt template  for test case , use markdown IDE. 
+- Prompt template  for test scenarios , use markdown IDE. 
+- Token limit override
+
+
+Access Control
+
+-- list of user and permisison. 
+--  add user 
+-- remove user
+
+
+Bottom Actions
+
+- Cancel
+- Create Project (Primary CTA)
+
+### Core Functionalities
+
+- Validate unique name
+- Validate required fields (Project Name, Owner)
+- Generate Project ID
+- Initialize:
+  - Default suite folder
+  - Baseline snapshot v1.0
+- Assign RBAC roles
+- Configure AI and framework settings
+- Set governance controls
+- Configure access permissions
+- Log creation event
+- Navigate to dashboard on success
+
+
+
+
+# Test Project Detail
+
+### Purpose
+
+Central navigation hub for a specific project.
+
+### Key Design Elements
+
+#### Header
+
+- Project Name
+- Project ID
+- Owner
+- Status badge
+
+#### Tabs
+
+- Requirements
+- Test Cases
+- Executions
+- Settings
+
+### Core Functionalities
+
+- Context switching to project-scoped mode
+- Tab-based navigation
+- Role-based editing
+
+### States & Edge Conditions
+
+- Archived project (read-only)
+- Snapshot comparison mode
+- Role-based hidden tabs
+
+# Project Overview
+
+### Purpose
+
+Project-scoped health and coverage visibility.
+
+### Key Design Elements
+
+#### Metric Cards
+
+- Requirements coverage %
+- Automation rate
+- Pass rate
+- Pending approvals
+- Flaky tests
+
+#### Charts
+
+- Pass trend
+- Failure distribution
+- Coverage breakdown
+
+#### Recent Activity
+
+- Requirement changes
+- Script approvals
+- Executions
+
+### Core Functionalities
+
+- Drill down to modules
+- Filter by suite
+- Filter by tag
+- Snapshot comparison quick view
+
+### States & Edge Conditions
+
+- New project (no data)
+- High failure alert banner
+
+
+
+# Requirements tab
+
+## Purpose
+
+Central view of all requirements under project.
+Used for ingestion tracking, gap detection status, and traceability visibility.
+
+## Key Design Elements
+
+### Page Header
+
+- Title: “Requirements”
+- Release filter
+- Status filter (Draft / Clarification Required / Ready / Cases Generated / Approved)
+- Search bar
+- “Ingest Requirement” button (Primary CTA)
+
+### Requirements Table
+
+Columns:
+
+- Title (link)
+- Release
+- Status
+- Linked Test Cases (link with count)
+- Coverage Status (Not Generated / Partial / Complete)
+- Last Modified
+- Owner
+- Actions (View / Archive)
+
+### Status Indicators (Badges)
+
+- Draft
+- Clarification Required (Warning icon)
+- Ready for Scenario Generation
+- Scenarios Generated
+- Test Cases Generated
+- Approved
+- Archived
+
+## Core Functionalities
+
+- Search by keyword
+- Filter by project, release, status
+- Bulk select (archive, tag)
+- Navigate to Requirement Detail
+- Trigger scenario generation (if eligible)
+- Regenerate AI analysis (explicit action only)
+- Export requirement list
+
+## States & Edge Cases
+
+- No requirements
+- Archived requirements hidden by default
+- Requirement locked due to downstream approved artifacts
+- Role-based restrictions on regeneration
+
+# Requirement Ingestion
+
+### Purpose
+
+Input structured or semi-structured requirement data and initiate AI analysis.
+
+This is the first AI invocation step.
+
+### Key Design Elements
+
+### Section 1: Requirement Input
+
+Structured Form:
+
+- Title (Required)
+- Description (Rich text)
+- Acceptance Criteria (Structured list or rich text)
+- Release
+
+### Section 2: AI Pre-Analysis Output (Collapsible Panel)
+
+After clicking “Analyze”:
+
+Displays structured extraction:
+
+- Functional Flows
+- Preconditions
+- Postconditions
+- Business Rules
+- Dependencies
+- Authentication Requirements
+- Validation Rules
+- Constraints
+
+### Section 3: Detected Issues Panel
+
+Highlight warnings:
+
+- Ambiguous language
+- Missing acceptance criteria
+- Logical conflicts
+- Incomplete flows
+
+Each issue:
+
+- Expandable explanation
+- “Edit Requirement” quick link
+
+### Footer Actions
+
+- Cancel
+- Save as Draft
+- Save & Analyze
+- Submit for Clarification Resolution
+
+### Core Functionalities
+
+- Validate required fields
+- Run deterministic AI extraction
+- Log:
+  - Model version
+  - Prompt version
+  - Token usage
+  - Generation duration
+- Assign Requirement ID
+- Create version 1.0
+- Prevent scenario generation until issues resolved
+
+
+
+# Requirement Detail
+
+### Purpose
+
+Authoritative source of truth for a single requirement.
+
+Central traceability anchor.
+
+### Key Design Elements
+
+### Header Section
+
+- Requirement ID
+- Title
+- Project
+- Release
+- Owner
+- Created date
+- Last modified
+
+Action buttons:
+
+- Edit
+- Regenerate Analysis
+- Generate Scenarios
+- Archive
+
+### Tabs Within Requirement Detail
+
+Overview
+AI Analysis
+Linked Scenarios
+Linked Test Cases
+Linked Scripts
+Execution History
+Version History
+Audit Log
+
+### Overview Tab
+
+Displays:
+
+- Description
+- Acceptance Criteria
+- Tags
+- Priority
+
+### AI Analysis Tab
+
+Structured extraction view:
+
+- Flows
+- Rules
+- Dependencies
+- Constraints
+- Ambiguity log
+- Analysis timestamp
+- Model/prompt version used
+
+### Linked Artifacts Section
+
+Clickable counts:
+
+- Scenarios
+- Test Cases
+- Scripts
+- Executions
+
+Traceability chain visualization (horizontal flow view)
+
+### Core Functionalities
+
+- Edit requirement (creates new version)
+- View version diff
+- Lock editing if downstream approved scripts exist (optional governance rule)
+- Regenerate scenarios if updated
+- View approval status of downstream artifacts
+
+
+
+# Test Scenario and Test Case Generation Page
+
+### Purpose
+
+Generate comprehensive test scenarios and test cases from a clarified requirement in a unified workflow. This combined page allows users to create, edit, and manage both scenarios and test cases before proceeding to script generation.
+
+This page enforces:
+
+- Coverage completeness
+- Gap validation
+- Duplicate prevention
+- Flexible manual and AI-generated content creation
+
+It sits between:
+Requirement Ingestion → Script Generation
+
+### Key Design Elements
+
+#### Progress Stepper (Top Section)
+
+4-step workflow visualization:
+
+1. Ingest Requirement (Complete - green checkmark)
+2. Generate Test Cases (Current - blue highlight)
+3. Generate Test Scripts (Pending - gray)
+4. Executions (Pending - gray)
+
+Purpose:
+Provide workflow context and show current progress in the test automation pipeline.
+
+### Section 1: Requirement Summary (Collapsible)
+
+Displays:
+
+- Description
+- Acceptance Criteria
+- Extracted Flows
+- Business Rules
+- Constraints
+
+Purpose:
+Provide context while reviewing scenarios.
+
+### Section 2: Test Scenarios (Core Area)
+
+#### Header
+- "Test Scenarios" title
+- Scenario count display
+- "Add Scenario" button (Primary CTA)
+- "Generate Test Cases" button (Green CTA)
+
+#### Add Scenario Panel
+
+Expandable blue-bordered form panel:
+
+- Title field (Required)
+- Description field (Required)
+- Cancel button
+- Save button (Primary CTA)
+
+#### Scenario List
+
+Displayed as expandable cards with:
+
+- Scenario ID
+- Scenario Title
+- Type badge (Happy Path / Negative / Edge Case / Authorization)
+- Expand/collapse toggle
+- Action buttons (Edit / Delete)
+
+Expanded view shows:
+
+- Preconditions
+- Description
+- Expected Outcome
+
+#### Edit Mode
+
+When editing, the expanded scenario converts to:
+
+- Preconditions (textarea)
+- Description (textarea)
+- Expected Outcome (textarea)
+- Save button
+- Cancel button
+
+### Section 3: Generated Test Cases
+
+#### Header
+- "Generated Test Cases" title
+- Test case count display
+- "Add Test Case" button (Primary CTA)
+
+#### Add Test Case Panel
+
+Expandable blue-bordered form panel:
+
+- Title field (Required)
+- Preconditions (textarea)
+- Test Steps (dynamic array)
+  - Each step has action text input
+  - Camera icon for snapshot toggle
+  - Add/Remove step buttons
+- Expected Results (textarea)
+- Postconditions (textarea)
+- Cancel button
+- Save button (Primary CTA)
+
+#### Test Case List
+
+Displayed as expandable cards with:
+
+- Test Case ID
+- Scenario ID
+- Requirement ID
+- Title
+- Expand/collapse toggle
+- Action buttons (Edit / Generate Scripts)
+
+Expanded view shows:
+
+- Preconditions
+- Test Steps (numbered list with snapshot indicators)
+- Expected Results
+- Postconditions
+- Generation Metadata (timestamp, model version, prompt version, token usage)
+
+#### Edit Mode
+
+When editing, the expanded test case converts to editable form:
+
+- Title (text input)
+- Preconditions (textarea)
+- Test Steps (dynamic array with add/remove/snapshot controls)
+- Expected Results (textarea)
+- Postconditions (textarea)
+- Save button
+- Cancel button
+
+### Footer Actions
+
+- Cancel (secondary)
+- Save (secondary)
+- Generate Scripts (Primary CTA)
+
+### Core Functionalities
+
+#### Manual Creation
+
+- Add scenarios with title and description
+- Add test cases with full structure (title, preconditions, steps, expected results, postconditions)
+- Dynamic step management with snapshot toggles
+
+#### AI Generation
+
+- "Generate Test Cases" button triggers AI generation from scenarios
+- Deterministic generation
+- Structured output aligned to QA template
+- No duplicate Test Case IDs
+- Logged metadata:
+  - Model version
+  - Prompt version
+  - Token usage
+  - Generation duration
+
+#### Editing Capabilities
+
+- Inline editing for both scenarios and test cases
+- Edit mode with save/cancel actions
+- All edits logged in audit trail
+- Flexible step management (add/remove/reorder)
+
+#### Navigation Flow
+
+- "Generate Scripts" button on each test case navigates to `/scripts/generate`
+- Footer "Generate Scripts" button proceeds to script generation workflow
+- "Cancel" returns to project requirements tab
+
+
+
+
+# Governance & Determinism Indicators (Important for Mockups)
+
+On the page somewhere visible:
+
+Small metadata panel:
+
+- Model version
+- Prompt template version
+- Temperature (locked)
+- Generation timestamp
+- Token usage
+
+This builds enterprise trust.
+
+# Automation Script Generation Page
+
+### Purpose
+
+Generate Playwright automation scripts from approved test cases and enforce human validation before scripts can be committed or executed.
+
+This page ensures:
+
+- Framework compliance
+- Structural correctness
+- Assertion integrity
+- No hardcoded sensitive data
+- Deterministic generation
+- Version traceability
+
+Position in workflow:
+
+Test Case Approval → Script Generation → Script Review → Execution
+
+###  Entry Conditions
+
+User can access this page only if:
+
+- Test Case status = Approved
+- Requirement not archived
+- User has generation permissions
+- Script not already approved (or regeneration explicitly requested)
+
+### Layout Structure
+
+### Header Section
+
+Left:
+
+- Requirement ID
+- Test Case ID(s)
+- Project
+- Framework (Playwright)
+- Language (TypeScript / Python)
+- Version badge
+
+Right:
+
+- Regenerate Script (secondary)
+- Approve Script (disabled until validation passes)
+- Back to Test Cases
+
+### Section 1: Generation Configuration Panel
+
+This ensures transparency before generation.
+
+Fields:
+
+- Framework: Playwright (fixed in PoC)
+- Language: TypeScript / Python
+- Directory Structure Preview
+- Naming Convention Preview
+- Page Object Strategy Toggle
+- Reusable Component Detection (on/off)
+- Assertion Style (soft vs hard)
+- Wait Strategy (explicit / smart wait)
+
+Advanced (collapsible):
+
+- Timeout configuration
+- Retry strategy
+- Parallelization flag
+
+Primary Button:
+Generate Script
+
+### Section 2: Script Output Viewer (Core Area)
+
+Split view layout:
+
+Left Panel:
+
+- Generated Script (syntax highlighted editor)
+- Line numbers
+- Code folding
+- Search within file
+
+Right Panel:
+
+- Structural Validation Results
+- Rule Check Status
+- Lint Results
+- Framework Compliance Status
+
+
+
+### Section : Approval Panel (Sticky Footer)
+
+Displays:
+
+Buttons:
+
+- Save Draft
+- Reject (with comment)
+- Approve Script
+
+Primary CTA:
+Approve Script (enabled only when validation passes)
+
+### Core Functionalities
+
+### AI Script Generation
+
+- Deterministic output
+- Uses:
+  - Approved test case only
+  - Framework conventions
+  - Naming standards
+- Logs:
+  - Model version
+  - Prompt template version
+  - Token usage
+  - Generation duration
+- Generates unique Script ID
+- Maps to Test Case ID
+- Version 1.0 created
+
+### Structural Validation Engine
+
+Automatically checks:
+
+- Directory path correctness
+- Test naming structure
+- Assertion presence
+- Mapping to expected results
+- No plaintext secrets
+- No undefined variables
+- Lint compliance
+
+Must pass before approval allowed.
+
+### Manual Editing
+
+Inline code editor allows:
+
+- Selector adjustments
+- Assertion changes
+- Refactor logic
+- Add helper functions
+
+All edits:
+
+- Create new version
+- Logged in audit trail
+
+### Regeneration Controls
+
+When clicking Regenerate:
+
+Modal warns:
+
+“Regenerating will create a new version. Existing executions remain linked to previous version.”
+
+Options:
+
+- Full regenerate
+- Regenerate from updated test case
+- Cancel
+
+### Approval Logic
+
+States:
+
+- Draft
+- Edited
+- Validation Failed
+- Approved
+- Rejected
+
+Only Approved:
+
+- Can be executed
+- Can be committed
+- Can appear in Execution Launcher
+
+Approval logs:
+
+- Reviewer identity
+- Timestamp
+- Version
+- Diff summary
+
+# Live Execution Monitor
+
+### Purpose
+
+Provide real-time visibility into test execution progress.
+
+Operational, dynamic, and informative.
+
+### Layout Structure
+
+### Header
+
+- Execution ID
+- Status badge (Running / Failed / Passed / Cancelled)
+- Start time
+- Elapsed time
+- Cancel Execution button
+
+### Section 1: Progress Overview
+
+Progress bar:
+
+- Total tests
+- Passed
+- Failed
+- Skipped
+- In Progress
+
+Visual indicators:
+
+- Green = pass
+- Red = fail
+- Yellow = running
+
+### Section 2: Test Execution Grid
+
+Columns:
+
+- Test Case ID
+- Test Name
+- Suite
+- Status
+- Duration
+- Retry Count
+- Failure Type
+
+Row click expands to:
+
+- Step-by-step log
+- Screenshot thumbnails
+- Console logs
+- Network logs
+- Error stack trace
+
+
+### Core Functionalities
+
+- Live streaming updates
+- Manual cancel
+- Auto-scroll logs
+- Expand individual test logs
+- Filter by status (Failed only toggle)
+- Download raw logs
+
+### Execution Results
+
+### Purpose
+
+Provide finalized, structured summary of execution.
+
+Used for:
+
+- QA reporting
+- Release readiness
+- Failure triage
+- Trend tracking
+
+### Layout Structure
+
+### Header
+
+- Execution ID
+- Status (Passed / Failed / Partial)
+- Start time
+- End time
+- Total duration
+- Triggered by
+
+Actions:
+
+- Re-run
+- Export Report
+- Share link
+
+### Section 1: Summary Cards
+
+- Total Tests
+- Passed
+- Failed
+- Skipped
+- Flaky detected
+- Pass Rate %
+
+### Section 2: Failure Breakdown
+
+Donut or bar chart:
+
+- Assertion failures
+- Locator issues
+- Authentication errors
+- Environment issues
+- Timeout failures
+
+Clickable to filter table below.
+
+### Section 3: Test Result Table
+
+Columns:
+
+- Test Case ID
+- Script Version
+- Status
+- Duration
+- Retry Count
+- Failure Category
+- Linked Requirement
+
+Click row to expand:
+
+- Logs
+- Screenshots
+- Stack trace
+- Environment snapshot
+- Script version used
+
+# Core Functionalities
+
+- Export PDF / CSV report
+- Re-run selected failed tests
+- Link back to test case
+- Link back to requirement
+- Download artifacts
