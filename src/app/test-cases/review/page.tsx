@@ -416,7 +416,7 @@ export default function TestCaseReviewPage() {
                                 {step.action}
                               </span>
                               {step.takeSnapshot && (
-                                <Camera className="w-4 h-4 text-blue-600" title="Snapshot" />
+                                <Camera className="w-4 h-4 text-blue-600" aria-label="Snapshot" />
                               )}
                             </>
                           )}
